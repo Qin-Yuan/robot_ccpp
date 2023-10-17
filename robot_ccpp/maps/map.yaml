@@ -1,4 +1,4 @@
-image: clean_room.pgm
+image: map.pgm
 resolution: 0.050000
 origin: [-5.159059, -3.144864, 0.000000]
 negate: 0

@@ -1,14 +1,20 @@
-#include "CleaningPathPlanner.h"
+#include "robot_ccpp/CleaningPathPlanner.h"
 #include <nav2_costmap_2d/cost_values.hpp>
 
 // #include <nav2_costmap_2d/cost_values.h>
 
-CleaningPathPlanning::CleaningPathPlanning(nav2_costmap_2d::Costmap2DROS *costmap2d_ros)
-: Node("CleaningPathPlanning") {
+CleaningPathPlanning::CleaningPathPlanning()
+: Node("path_planning_node") {
+    
     //temp solution.
-    costmap2d_ros_ = costmap2d_ros;
+    costmap2d_ros_ = std::make_shared<nav2_costmap_2d::Costmap2DROS>(
+        "clean_costmap", std::string{get_namespace()}, "clean_costmap");    
+    costmap_thread_ = std::make_unique<nav2_util::NodeThread>(costmap2d_ros_);
+    costmap2d_ros_->configure();
+
+
     //costmap2d_ros_->updateMap();
-    costmap2d_ = costmap2d_ros->getCostmap();
+    costmap2d_ = costmap2d_ros_->getCostmap();
 
     // ros::NodeHandle private_nh("~/cleaning_plan_nodehandle");
     plan_pub_ = this->create_publisher<nav_msgs::msg::Path>("cleaning_path",rclcpp::QoS(rclcpp::KeepLast(10))) ;
@@ -60,6 +66,8 @@ CleaningPathPlanning::CleaningPathPlanning(nav2_costmap_2d::Costmap2DROS *costma
         initialized_ = true; //这句话説明srcMap_里面得有东西才能说明初始化成功。
     else
         initialized_ = false;
+
+    RCLCPP_INFO(this->get_logger(), "CleaningPathPlanning running ...") ;
 }
 //规划路径
 vector<geometry_msgs::msg::PoseStamped> CleaningPathPlanning::GetPathInROS()
