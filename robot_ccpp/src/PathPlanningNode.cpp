@@ -17,9 +17,10 @@ int main(int argc, char** argv) {
     rclcpp::init(argc, argv) ;
     auto clr_node = std::make_shared<CleaningPathPlanning>();
     clr_node->GetPathInROS() ;
-    rclcpp::Rate rate(1) ;  // 1 Hz
+    rclcpp::Rate rate(5) ;  // 1 Hz
     while(rclcpp::ok()) {
         clr_node->PublishCoveragePath();
+        clr_node->PublishGrid();
         rclcpp::spin_some(clr_node) ;
         rate.sleep() ;
     }

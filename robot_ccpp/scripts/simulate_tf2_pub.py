@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import rclpy
 from rclpy.node import Node
 import tf2_ros
@@ -9,8 +10,8 @@ class OdomToMapTFPublisher(Node):
     def __init__(self):
         super().__init__('odom_to_map_tf_publisher')
         self.tf_broadcaster = tf2_ros.TransformBroadcaster(self)
-
         self.create_timer(0.1, self.publish_tf)  # 设置定时器以发布TF变换
+        self.get_logger().info('odom to map tf publisher ...')
 
     def publish_tf(self):
         # 创建一个TF变换消息

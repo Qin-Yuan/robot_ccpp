@@ -66,8 +66,7 @@ global_costmap:
       use_sim_time: False
 
 
-
 path_planning_node:   
   ros__parameters:
-    size_of_cell: 3
+    size_of_cell: 5
     grid_covered_value: 200

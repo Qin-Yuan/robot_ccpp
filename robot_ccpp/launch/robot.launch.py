@@ -8,6 +8,10 @@ from launch_ros.actions import LoadComposableNodes
 from launch_ros.actions import Node
 from launch_ros.descriptions import ComposableNode
 from nav2_common.launch import RewrittenYaml
+from launch.actions import (DeclareLaunchArgument, GroupAction,
+                            IncludeLaunchDescription, SetEnvironmentVariable)
+from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.substitutions import LaunchConfiguration, PythonExpression
 
 
 def generate_launch_description():
@@ -104,59 +108,34 @@ def generate_launch_description():
     declare_log_level_cmd = DeclareLaunchArgument(
         'log_level', default_value='info',
         description='log level')
-
-    load_nodes = GroupAction(
-        condition=IfCondition(PythonExpression(['not ', use_composition])),
-        actions=[
-            Node(
-                package='nav2_map_server',
-                executable='map_server',
-                name='map_server',
-                output='screen',
-                respawn=use_respawn,
-                respawn_delay=2.0,
-                parameters=[configured_params],
-                arguments=['--ros-args', '--log-level', log_level],
-                remappings=remappings),
-            Node(
-                package='nav2_lifecycle_manager',
-                executable='lifecycle_manager',
-                name='lifecycle_manager_localization',
-                output='screen',
-                arguments=['--ros-args', '--log-level', log_level],
-                parameters=[{'use_sim_time': use_sim_time},
-                            {'autostart': autostart},
-                            {'node_names': lifecycle_nodes}])
-        ]
-    )
-
-    load_composable_nodes = LoadComposableNodes(
-        condition=IfCondition(use_composition),
-        target_container=container_name_full,
-        composable_node_descriptions=[
-            ComposableNode(
-                package='nav2_map_server',
-                plugin='nav2_map_server::MapServer',
-                name='map_server',
-                parameters=[configured_params],
-                remappings=remappings),
-            ComposableNode(
-                package='nav2_lifecycle_manager',
-                plugin='nav2_lifecycle_manager::LifecycleManager',
-                name='lifecycle_manager_localization',
-                parameters=[{'use_sim_time': use_sim_time,
-                            'autostart': autostart,
-                            'node_names': lifecycle_nodes}]),
-        ],
-    )
     
-    # 全覆盖路径规划算法
+    # 全覆盖路径规划算法node
     path_planning_node = Node(package='robot_ccpp',
                             executable='path_planning_node',
                             parameters=[{'use_sim_time': use_sim_time},configured_params],
                             output = 'screen'
                             )
+    # 地图加载launch
+    map_server_launch = IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(os.path.join(get_package_share_directory('robot_ccpp'),
+                                                    'launch',
+                                                    'robot_map_server.launch.py')),
+            # condition=IfCondition(PythonExpression(['not'])),
+            launch_arguments={'namespace': namespace,
+                            'map': map_yaml_file,
+                            'use_sim_time': use_sim_time,
+                            'autostart': autostart,
+                            'params_file': params_file,
+                            'use_composition': use_composition,
+                            'use_respawn': use_respawn,
+                            'container_name': 'nav2_container'}.items())
     
+    # 模拟 tf2 发布node
+    simulate_tf2_node = Node(package='robot_ccpp',
+                        executable='simulate_tf2_pub.py',
+                        parameters=[{'use_sim_time': use_sim_time},configured_params],
+                        output = 'screen'
+                        )
     # Create the launch description and populate
     ld = LaunchDescription()
 
@@ -173,10 +152,12 @@ def generate_launch_description():
     ld.add_action(declare_container_name_cmd)
     ld.add_action(declare_use_respawn_cmd)
     ld.add_action(declare_log_level_cmd)
+    
+    # launch 
+    ld.add_action(map_server_launch)
 
     # Add the actions to launch all of the localiztion nodes
-    # ld.add_action(load_nodes)
-    # ld.add_action(load_composable_nodes)
-    ld.add_action(path_planning_node)
+    # ld.add_action(path_planning_node)
+    ld.add_action(simulate_tf2_node)
 
     return ld

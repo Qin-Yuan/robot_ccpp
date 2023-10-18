@@ -23,21 +23,16 @@ CleaningPathPlanning::CleaningPathPlanning()
     // plan_pub_ = private_nh.advertise<nav_msgs::msg::Path>("cleaning_path", 1);
     // grid_pub_ = private_nh.advertise<nav_msgs::msg::OccupancyGrid>("covered_grid", 1);
 
-    string sizeOfCellString, coveredValueStr;
-
     SIZE_OF_CELL = 3;
-    if (this->get_parameter("size_of_cell" , sizeOfCellString)) //搜索参数,根据名称"size of cell"搜索参数，将对应名称下的参数值赋给sizeOfCellString.
-        this->declare_parameter<int>("size_of_cell" , SIZE_OF_CELL);   //设置机器人占据n*n的栅格，决定规划的稀疏   
-    
     GRID_COVERED_VALUE = 0;
-    if (this->get_parameter("grid_covered_value" , coveredValueStr))
-        this->declare_parameter<int>("grid_covered_value" , GRID_COVERED_VALUE);
 
-    // if (private_nh.searchParam("size_of_cell", sizeOfCellString)) //搜索参数,根据名称"size of cell"搜索参数，将对应名称下的参数值赋给sizeOfCellString.
-    //     private_nh.param("size_of_cell", SIZE_OF_CELL, 3);   //设置机器人占据n*n的栅格，决定规划的稀疏   
-    // GRID_COVERED_VALUE = 0;
-    // if (private_nh.searchParam("grid_covered_value", coveredValueStr))
-    //     private_nh.param("grid_covered_value", GRID_COVERED_VALUE, 0);
+    this->declare_parameter<int>("size_of_cell" , SIZE_OF_CELL) ;    // 设置机器人占据n*n的栅格，决定规划的稀疏   
+    this->get_parameter("size_of_cell" , SIZE_OF_CELL) ;             // 搜索参数,根据名称"size of cell"搜索参数，将对应名称下的参数值赋给sizeOfCellString.
+    cout << "SIZE_OF_CELL : " << SIZE_OF_CELL << endl ;
+    
+    this->declare_parameter<int>("grid_covered_value" , GRID_COVERED_VALUE);
+    this->get_parameter("grid_covered_value" , GRID_COVERED_VALUE) ;
+    cout << "GRID_COVERED_VALUE : " << GRID_COVERED_VALUE << endl;
 
     int sizex = costmap2d_->getSizeInCellsX(); //获取地图尺寸
     int sizey = costmap2d_->getSizeInCellsY();
