@@ -12,6 +12,7 @@ CleaningPathPlanning::CleaningPathPlanning()
     costmap_thread_ = std::make_unique<nav2_util::NodeThread>(costmap2d_ros_);
     costmap2d_ros_->configure();
 
+    // std::this_thread::sleep_for(std::chrono::milliseconds(2000)); // 2秒延时
 
     //costmap2d_ros_->updateMap();
     costmap2d_ = costmap2d_ros_->getCostmap();
@@ -38,24 +39,31 @@ CleaningPathPlanning::CleaningPathPlanning()
     int sizey = costmap2d_->getSizeInCellsY();
     cout << "The size of map is " << sizex << "  " << sizey << endl;
     resolution_ = costmap2d_->getResolution(); //分辨率
+    
+    // 保存地图
+    // costmap2d_->saveMap("qinyuansai.png");
 
     srcMap_ = Mat(sizey, sizex, CV_8U);
+
+    cout << "地图：" ;
     for (int r = 0; r < sizey; r++)
     {
         for (int c = 0; c < sizex; c++)
         {
-            srcMap_.at<uchar>(r, c) = costmap2d_->getCost(c, sizey - r - 1); //??sizey-r-1 caution: costmap's origin is at left bottom ,while opencv's pic's origin is at left-top.
+            srcMap_.at<uchar>(r, c) = costmap2d_->getCost(c, sizey - r - 1); // ??sizey-r-1 caution: costmap's origin is at left bottom ,while opencv's pic's origin is at left-top.
+            cout << costmap2d_->getCost(c, sizey - r - 1) ;
             //getCost（）:获取代价值
         }
     }
+    cout << endl ;
 
     initializeMats();
     initializeCoveredGrid();
 
-    //imshow("debugMapImage",srcMap_);
-    //imshow("debugCellMatImage",cellMat_);
-    //waitKey(0);
-    //imwrite("debug_srcmap.jpg",srcMap_);
+    // imshow("debugMapImage",srcMap_);
+    // imshow("debugCellMatImage",cellMat_);
+    // waitKey(0);
+    // imwrite("debug_srcmap.jpg",srcMap_);
 
     if (!srcMap_.empty())
         initialized_ = true; //这句话説明srcMap_里面得有东西才能说明初始化成功。

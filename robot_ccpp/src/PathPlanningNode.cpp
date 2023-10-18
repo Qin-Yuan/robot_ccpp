@@ -22,6 +22,7 @@ int main(int argc, char** argv) {
         clr_node->PublishCoveragePath();
         clr_node->PublishGrid();
         rclcpp::spin_some(clr_node) ;
+        // rclcpp::spin_some(clr_node.costmap2d_ros_->) ;
         rate.sleep() ;
     }
     rclcpp::shutdown() ;   
