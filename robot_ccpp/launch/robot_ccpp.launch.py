@@ -47,6 +47,12 @@ def generate_launch_description():
                                             'rviz2_ccpp.rviz')],
                         parameters=[{'use_sim_time': use_sim_time}],
                         output='screen')
+    # next_goal node 发布
+    next_goal_node = Node(package='robot_ccpp',
+                            executable='next_goal_node',
+                            parameters=[{'use_sim_time': use_sim_time},configured_params],
+                            output = 'screen'
+                            )
     
     return LaunchDescription([
         DeclareLaunchArgument(
@@ -62,5 +68,6 @@ def generate_launch_description():
         # voxel_visualizer_node,
         path_planning_node,
         # rviz2 node
-        rviz2_node
+        rviz2_node,
+        next_goal_node
     ])

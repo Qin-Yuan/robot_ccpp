@@ -39,17 +39,22 @@ set(dependencies
   "nav_msgs"
 )
 
-set(EXEC_NAME "path_planning_node")
-add_executable(${EXEC_NAME} src/PathPlanningNode.cpp src/CleaningPathPlanner.cpp)
+set(path_planning "path_planning_node")
+add_executable(${path_planning} src/PathPlanningNode.cpp src/CleaningPathPlanner.cpp)
 # 链接子项目的库到主项目
-target_link_libraries(${EXEC_NAME} ${OpenCV_LIBS})
-ament_target_dependencies(${EXEC_NAME} ${dependencies})
+target_link_libraries(${path_planning} ${OpenCV_LIBS})
+ament_target_dependencies(${path_planning} ${dependencies})
 
+set(next_goal "next_goal_node")
+add_executable(${next_goal} src/next_goal.cpp)
+# 链接子项目的库到主项目
+target_link_libraries(${next_goal} ${OpenCV_LIBS})
+ament_target_dependencies(${next_goal} ${dependencies})
 ################################################################################
 # Install
 ################################################################################
 # 屏蔽生成的c++可执行文件，用python文件去运行
-install(TARGETS ${EXEC_NAME}
+install(TARGETS ${path_planning} ${next_goal}
   DESTINATION lib/${PROJECT_NAME}
 )
 

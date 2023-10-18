@@ -20,8 +20,8 @@ class OdomToMapTFPublisher(Node):
         transform.header.frame_id = 'map'  # 目标坐标系为'map'
         transform.child_frame_id = 'base_link'  # 源坐标系为'odom'
         # 设置变换矩阵
-        transform.transform.translation.x = 0.0     # 以示例方式设置平移
-        transform.transform.translation.y = 0.0
+        transform.transform.translation.x = -1.68     # 以示例方式设置平移
+        transform.transform.translation.y = -2.37
         transform.transform.translation.z = 0.0
         transform.transform.rotation.x = 0.0
         transform.transform.rotation.y = 0.0

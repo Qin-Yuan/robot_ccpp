@@ -9,9 +9,15 @@ CleaningPathPlanning::CleaningPathPlanning()
     //temp solution.
     costmap2d_ros_ = std::make_shared<nav2_costmap_2d::Costmap2DROS>(
         "clean_costmap", std::string{get_namespace()}, "clean_costmap");    
+    
     costmap_thread_ = std::make_unique<nav2_util::NodeThread>(costmap2d_ros_);
     costmap2d_ros_->configure();
-
+    costmap2d_ros_->activate();
+    rclcpp::Rate r(100);
+    while (!costmap2d_ros_->isCurrent()) {
+        r.sleep();
+    }
+    
     // std::this_thread::sleep_for(std::chrono::milliseconds(2000)); // 2秒延时
 
     //costmap2d_ros_->updateMap();
@@ -41,21 +47,18 @@ CleaningPathPlanning::CleaningPathPlanning()
     resolution_ = costmap2d_->getResolution(); //分辨率
     
     // 保存地图
-    // costmap2d_->saveMap("qinyuansai.png");
+    costmap2d_->saveMap("qinyuansai.png");
 
     srcMap_ = Mat(sizey, sizex, CV_8U);
 
-    cout << "地图：" ;
     for (int r = 0; r < sizey; r++)
     {
         for (int c = 0; c < sizex; c++)
         {
             srcMap_.at<uchar>(r, c) = costmap2d_->getCost(c, sizey - r - 1); // ??sizey-r-1 caution: costmap's origin is at left bottom ,while opencv's pic's origin is at left-top.
-            cout << costmap2d_->getCost(c, sizey - r - 1) ;
             //getCost（）:获取代价值
         }
     }
-    cout << endl ;
 
     initializeMats();
     initializeCoveredGrid();

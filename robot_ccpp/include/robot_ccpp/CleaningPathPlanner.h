@@ -16,6 +16,7 @@
 #include <mutex>
 
 
+#include "rclcpp/rclcpp.hpp"
 #include "tf2_ros/transform_listener.h"
 #include "nav2_costmap_2d/costmap_2d.hpp"
 #include "nav2_costmap_2d/costmap_2d_ros.hpp"
