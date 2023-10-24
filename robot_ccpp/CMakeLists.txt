@@ -15,7 +15,6 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(rclcpp REQUIRED)
-# find_package(opencv2 REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(nav2_costmap_2d REQUIRED)
@@ -32,7 +31,6 @@ include_directories(
 set(dependencies
   "std_msgs"
   "rclcpp"
-  # "opencv2"
   "tf2_ros"
   "nav2_costmap_2d"
   "geometry_msgs"
@@ -41,13 +39,11 @@ set(dependencies
 
 set(path_planning "path_planning_node")
 add_executable(${path_planning} src/PathPlanningNode.cpp src/CleaningPathPlanner.cpp)
-# 链接子项目的库到主项目
 target_link_libraries(${path_planning} ${OpenCV_LIBS})
 ament_target_dependencies(${path_planning} ${dependencies})
 
 set(next_goal "next_goal_node")
 add_executable(${next_goal} src/next_goal.cpp)
-# 链接子项目的库到主项目
 target_link_libraries(${next_goal} ${OpenCV_LIBS})
 ament_target_dependencies(${next_goal} ${dependencies})
 ################################################################################
