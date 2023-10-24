@@ -75,10 +75,10 @@ CleaningPathPlanning::CleaningPathPlanning()
 
     RCLCPP_INFO(this->get_logger(), "CleaningPathPlanning running ...") ;
 }
-//规划路径
+// 规划路径
 vector<geometry_msgs::msg::PoseStamped> CleaningPathPlanning::GetPathInROS()
 {
-    //    vector<geometry_msgs::msg::PoseStamped> resultVec;
+    // vector<geometry_msgs::msg::PoseStamped> resultVec;
     if (!pathVecInROS_.empty())
         pathVecInROS_.clear(); //清空操作
     geometry_msgs::msg::PoseStamped posestamped;
@@ -172,7 +172,7 @@ void CleaningPathPlanning::GetBorderTrackingPathInCV(vector<cv::Point2i> &result
     std::vector<cv::Point2i> borderPointsIndexVec; //todo:make point2i corrresponding to cellindex.
     resultVec.clear();
     if (srcMap_.empty())
-        return; //srcMap 是个啥？
+        return; // srcMap 是个啥？
 
     cv::Point2i temppoint;
     int r, c, i, j;
@@ -312,9 +312,10 @@ bool CleaningPathPlanning::initializeMats()
     if (srcMap_.empty())
         return false;
     getCellMatAndFreeSpace(srcMap_, cellMat_, freeSpaceVec_);
-
+    
     neuralizedMat_ = Mat(cellMat_.rows, cellMat_.cols, CV_32F);
     //Astarmap = Mat(cellMat_.rows, cellMat_.cols, CV_32F);
+    // 将cellMat 映射到 neuralizedMat_ 上，修改必要的像素值
     initializeNeuralMat(cellMat_, neuralizedMat_);
     //Astarmap = neuralizedMat_;
     return true;
@@ -327,6 +328,7 @@ void CleaningPathPlanning::getCellMatAndFreeSpace(Mat srcImg, Mat &cellMat, vect
     freeSpaceVec.clear();
     bool isFree = true;
     int r = 0, c = 0, i = 0, j = 0;
+    // 获取图像中的 FREE_SPACE 的坐标序列
     for (r = 0; r < cellMat.rows; r++)
     {
         for (c = 0; c < cellMat.cols; c++)
@@ -336,6 +338,7 @@ void CleaningPathPlanning::getCellMatAndFreeSpace(Mat srcImg, Mat &cellMat, vect
             {
                 for (j = 0; j < SIZE_OF_CELL; j++)
                 {
+                    // 判断对应点的像素值是否为 FREE_SPACE
                     if (srcImg.at<uchar>(r * SIZE_OF_CELL + i, c * SIZE_OF_CELL + j) != nav2_costmap_2d::FREE_SPACE)
                     {
                         isFree = false;
@@ -346,6 +349,7 @@ void CleaningPathPlanning::getCellMatAndFreeSpace(Mat srcImg, Mat &cellMat, vect
             }
             if (isFree)
             {
+                // 保存这个像素点位置
                 cellIndex ci;
                 ci.row = r;
                 ci.col = c;
@@ -695,7 +699,7 @@ bool CleaningPathPlanning::findElement(vector<Point2i> pointsVec, Point2i pt, in
     return false;
 }
 
-bool CleaningPathPlanning::initializeCoveredGrid() //在这里我对CoverGrid的理解为覆盖栅格。
+bool CleaningPathPlanning::initializeCoveredGrid()      // 在这里我对CoverGrid的理解为覆盖栅格。
 {
     // boost::unique_lock<nav2_costmap_2d::Costmap2D::mutex_t> lock(*(costmap2d_->getMutex()));
 
@@ -703,7 +707,7 @@ bool CleaningPathPlanning::initializeCoveredGrid() //在这里我对CoverGrid的
 
     double resolution = costmap2d_->getResolution(); //分辨率
 
-    covered_path_grid_.header.frame_id = "map"; //covered_path_grid_是costmap库中的占据栅格地图消息。
+    covered_path_grid_.header.frame_id = "map"; // covered_path_grid_是costmap库中的占据栅格地图消息。
     covered_path_grid_.header.stamp = now();
     covered_path_grid_.info.resolution = resolution;
 
@@ -711,7 +715,7 @@ bool CleaningPathPlanning::initializeCoveredGrid() //在这里我对CoverGrid的
     covered_path_grid_.info.height = costmap2d_->getSizeInCellsY();
 
     double wx, wy;
-    costmap2d_->mapToWorld(0, 0, wx, wy); //从地图坐标系转换至世界坐标系。
+    costmap2d_->mapToWorld(0, 0, wx, wy); // 从地图坐标系转换至世界坐标系。
     covered_path_grid_.info.origin.position.x = wx - resolution / 2;
     covered_path_grid_.info.origin.position.y = wy - resolution / 2;
     covered_path_grid_.info.origin.position.z = 0.0;

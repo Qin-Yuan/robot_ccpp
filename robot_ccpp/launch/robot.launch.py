@@ -136,6 +136,19 @@ def generate_launch_description():
                         parameters=[{'use_sim_time': use_sim_time},configured_params],
                         output = 'screen'
                         )
+    
+    # rviz2 显示
+    rviz2_node = Node(
+                        package='rviz2',
+                        executable='rviz2',
+                        name='rviz2',
+                        arguments=['-d', os.path.join(
+                                            get_package_share_directory('robot_ccpp'),
+                                            'rviz2',
+                                            'rviz2_ccpp.rviz')],
+                        parameters=[{'use_sim_time': use_sim_time}],
+                        output='screen')
+    
     # Create the launch description and populate
     ld = LaunchDescription()
 
@@ -157,7 +170,8 @@ def generate_launch_description():
     ld.add_action(map_server_launch)
 
     # Add the actions to launch all of the localiztion nodes
-    # ld.add_action(path_planning_node)
+    ld.add_action(path_planning_node)
     ld.add_action(simulate_tf2_node)
+    ld.add_action(rviz2_node)
 
     return ld
