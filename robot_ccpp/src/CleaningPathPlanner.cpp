@@ -47,7 +47,7 @@ CleaningPathPlanning::CleaningPathPlanning()
     resolution_ = costmap2d_->getResolution(); //分辨率
     
     // 保存地图
-    costmap2d_->saveMap("qinyuansai.png");
+    costmap2d_->saveMap("qinyuan.png");
 
     srcMap_ = Mat(sizey, sizex, CV_8U);
 
