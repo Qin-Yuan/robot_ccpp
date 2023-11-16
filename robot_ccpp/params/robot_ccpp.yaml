@@ -81,7 +81,7 @@ clean_costmap:
 
 path_planning_node:   
   ros__parameters:
-    size_of_cell: 3          # 8
+    size_of_cell: 8          # 8
     grid_covered_value: 55
 
 next_goal_node:   

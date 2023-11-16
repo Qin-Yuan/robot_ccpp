@@ -95,14 +95,14 @@ Path_planned planned_path;
 nav_msgs::msg::Path passed_path;
 rclcpp::Publisher<nav_msgs::msg::Path>::SharedPtr pub_passed_path ;
 
-void pose_callback(const nav_msgs::msg::Odometry &poses)
+void pose_callback(const nav_msgs::msg::Odometry::SharedPtr poses)
 { //里程计回调函数,用来计算当前机器人位置与前面目标点的距离,判断是否要发新的幕摆点
-  x_current = poses.pose.pose.position.x;
-  y_current = poses.pose.pose.position.y;
-  passed_path.header = poses.header;
+  x_current = poses->pose.pose.position.x;
+  y_current = poses->pose.pose.position.y;
+  passed_path.header = poses->header;
   geometry_msgs::msg::PoseStamped p;
-  p.header = poses.header;
-  p.pose = poses.pose.pose;
+  p.header = poses->header;
+  p.pose = poses->pose.pose;
   passed_path.poses.emplace_back(p);
   // pub_passed_path->publish(passed_path);
 }
@@ -111,21 +111,21 @@ int taille_last_path = 0;
 bool new_path = false;
 
 //接受规划的路径
-void path_callback(const nav_msgs::msg::Path &path)
+void path_callback(const nav_msgs::msg::Path::SharedPtr path)
 {
   //注意为了rviz显示方便 路径一直在发,但是这里只用接受一次就好,当规划的路径发生变化时候再重新装载
-  if ((planned_path.Path.size() == 0) || (path.poses.size() != taille_last_path))
+  if ((planned_path.Path.size() == 0) || (path->poses.size() != taille_last_path))
   {
     planned_path.Path.clear();
     new_path = true;
-    for (int i = 0; i < path.poses.size(); i++)
+    for (int i = 0; i < path->poses.size(); i++)
     {
-      planned_path.addGoal(path.poses[i].pose.position.x, path.poses[i].pose.position.y, false);
+      planned_path.addGoal(path->poses[i].pose.position.x, path->poses[i].pose.position.y, false);
 
-      cout << path.poses[i].pose.position.x << " " << path.poses[i].pose.position.y << endl;
+      cout << path->poses[i].pose.position.x << " " << path->poses[i].pose.position.y << endl;
     }
-    cout << "Recv path size:" << path.poses.size() << endl;
-    taille_last_path = path.poses.size();
+    cout << "Recv path size:" << path->poses.size() << endl;
+    taille_last_path = path->poses.size();
   }
 }
 
